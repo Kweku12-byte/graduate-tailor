@@ -52,8 +52,12 @@ export const Header = ({ setView, cartCount }) => {
         </header>
     );
 };
+export const HomePage = ({ products, mockReviews, setView, orders }) => {
+    const [orderId, setOrderId] = useState('');
+    const [foundOrder, setFoundOrder] = useState(null);
+    const [error, setError] = useState('');
+    const handleSubmit = (e) => { e.preventDefault(); setError(''); setFoundOrder(null); const order = orders.find(o => o.id.toLowerCase() === orderId.toLowerCase()); if(order){ setFoundOrder(order) } else { setError('Order ID not found. Please try again.')} };
 
-export const HomePage = ({ products, mockReviews, setView }) => {
     return (
         <div>
             <section className="hero-section">
@@ -93,6 +97,31 @@ export const HomePage = ({ products, mockReviews, setView }) => {
                             </div>
                         ))}
                     </div>
+                </div>
+            </section>
+            <section className="cta-section">
+                <div className="container">
+                    <h2 className="section-title">Ready to Find Your Perfect Fit?</h2>
+                    <p className="page-subtitle">Browse our full collection of bespoke menswear and discover the piece that speaks to you.</p>
+                    <button onClick={() => setView('shop')} className="btn btn-primary">Explore The Collection</button>
+                </div>
+            </section>
+            <section className="homepage-track-section">
+                 <div className="track-order-container container">
+                    <h1 className="page-title">Track Your Order</h1>
+                    <p className="page-subtitle">Enter your Order ID below to see the current status of your bespoke outfit.</p>
+                    <form onSubmit={handleSubmit} className="track-order-form">
+                         <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} placeholder="Enter Order ID (e.g. TGT-91523)" className="form-input"/>
+                         <button type="submit" className="btn btn-primary btn-full">Track</button>
+                    </form>
+                    {error && <p className="track-order-error">{error}</p>}
+                    {foundOrder && (
+                        <div className="order-status-card">
+                            <h2 className="order-status-title">Order Status: #{foundOrder.id}</h2>
+                            <p className="order-status-info"><span className="order-status-label">Customer:</span> {foundOrder.customerName}</p>
+                            <p className="order-status-info"><span className="order-status-label">Status:</span> <span className="order-status-value">{foundOrder.status}</span></p>
+                        </div>
+                    )}
                 </div>
             </section>
         </div>
@@ -172,7 +201,7 @@ export const CartPage = ({ cart, removeFromCart, cartTotal, setView }) => (
 );
 
 export const CheckoutPage = ({ placeOrder }) => {
-    const handleSubmit = (e) => { e.preventDefault(); const formData = new FormData(e.target); const customerDetails = { customerName: formData.get('fullName'), phone: formData.get('phone'), address: formData.get('address'), paymentMethod: formData.get('paymentMethod') }; placeOrder(customerDetails); };
+    const handleSubmit = (e) => { e.preventDefault(); const formData = new FormData(e.target); const customerDetails = { customerName: formData.get('fullName'), phone: formData.get('phone'), address: formData.get('address'), paymentMethod: formData.get('paymentMethod'), message: formData.get('message') }; placeOrder(customerDetails); };
     return(
         <div className="checkout-container container">
             <h1 className="page-title">Book Your Appointment</h1>
@@ -191,6 +220,10 @@ export const CheckoutPage = ({ placeOrder }) => {
                     <input type="text" name="address" required placeholder="e.g. Haatso Shop or Delivery Address" className="form-input" />
                 </div>
                 <div className="form-group">
+                    <label className="form-label">Additional Message (Optional)</label>
+                    <textarea name="message" rows="4" placeholder="e.g. specific design ideas, preferred fabric, deadlines..." className="form-input"></textarea>
+                </div>
+                <div className="form-group">
                   <h3 className="form-label">Payment Preference</h3>
                   <div className="radio-group">
                       <input id="pickup" name="paymentMethod" type="radio" value="Pay on Pickup" defaultChecked className="form-radio"/>
@@ -207,10 +240,15 @@ export const CheckoutPage = ({ placeOrder }) => {
     );
 };
 
-export const OrderConfirmationPage = ({ setView }) => (
+export const OrderConfirmationPage = ({ setView, orderId }) => (
     <div className="confirmation-container container">
         <h1 className="confirmation-title">Booking Confirmed!</h1>
         <p className="confirmation-text">Thank you for choosing The Graduate Tailor. We have received your request and our team will contact you shortly to schedule your fitting.</p>
+        <div className="order-id-display">
+            <p>Your Order ID is:</p>
+            <strong>{orderId}</strong>
+            <p className="save-notice">Please save this ID to track your order.</p>
+        </div>
         <button onClick={() => setView('home')} className="btn btn-primary">Back to Home</button>
     </div>
 );
@@ -393,3 +431,5 @@ export const Footer = ({ setView }) => (
         </div>
     </footer>
 );
+
+

@@ -30,8 +30,8 @@ const mockReviews = [
 ];
 
 const initialOrders = [
-    { id: 'TGT-91523', customerName: 'Samuel Ofori', phone: '0244123456', address: '123 Spintex Rd, Accra', paymentMethod: 'Mobile Money', items: [{...initialProducts[1], quantity: 1}], total: 1200, status: 'Fitting Scheduled', date: new Date().toISOString() },
-    { id: 'TGT-91524', customerName: 'Emmanuel Annan', phone: '0555987654', address: 'Pickup at Haatso', paymentMethod: 'Pay on Pickup', items: [{...initialProducts[0], quantity: 2}], total: 1700, status: 'Ready for Pickup', date: new Date().toISOString() },
+    { id: 'TGT-91523', customerName: 'Samuel Ofori', phone: '0244123456', address: '123 Spintex Rd, Accra', paymentMethod: 'Mobile Money', message: 'Need it urgently for a wedding on Saturday.', items: [{...initialProducts[1], quantity: 1}], total: 1200, status: 'Fitting Scheduled', date: new Date().toISOString() },
+    { id: 'TGT-91524', customerName: 'Emmanuel Annan', phone: '0555987654', address: 'Pickup at Haatso', paymentMethod: 'Pay on Pickup', message: '', items: [{...initialProducts[0], quantity: 2}], total: 1700, status: 'Ready for Pickup', date: new Date().toISOString() },
 ];
 
 // --- Main App Component ---
@@ -41,17 +41,21 @@ export default function App() {
   const [isStaffLoggedIn, setIsStaffLoggedIn] = useState(false);
   const [products, setProducts] = useState(initialProducts);
   const [orders, setOrders] = useState(initialOrders);
+  const [lastOrderId, setLastOrderId] = useState(null); // --- UPDATE: State for last order ID
 
   const changeView = (newView) => { window.scrollTo(0, 0); setView(newView); };
   const addToCart = (product) => { setCart(prev => [...prev, { ...product, cartId: Date.now() }]); };
   const removeFromCart = (cartId) => { setCart(prev => prev.filter(item => item.cartId !== cartId)); };
   const cartTotal = cart.reduce((total, item) => total + item.price, 0);
 
+  // --- UPDATE: Now saves the additional message and sets the order ID for the confirmation page
   const placeOrder = (customerDetails) => {
       const newOrderId = `TGT-${Math.floor(Math.random() * 90000) + 10000}`;
+      // The customerDetails object now includes the 'message' field from the form
       const newOrder = {id: newOrderId, ...customerDetails, items: cart, total: cartTotal, status: 'Measurement Pending', date: new Date().toISOString()};
       setOrders(prev => [newOrder, ...prev]);
       setCart([]);
+      setLastOrderId(newOrderId); // Store the new ID
       changeView('orderConfirmation');
   };
 
@@ -65,11 +69,13 @@ export default function App() {
       case 'shop': return <ShopPage products={products} addToCart={addToCart} />;
       case 'cart': return <CartPage cart={cart} removeFromCart={removeFromCart} cartTotal={cartTotal} setView={changeView} />;
       case 'checkout': return <CheckoutPage placeOrder={placeOrder} />;
-      case 'orderConfirmation': return <OrderConfirmationPage setView={changeView} />;
+      // --- UPDATE: Pass the last order ID to the confirmation page
+      case 'orderConfirmation': return <OrderConfirmationPage setView={changeView} orderId={lastOrderId} />;
       case 'track': return <TrackOrderPage orders={orders} />;
       case 'staffLogin': return <StaffLoginPage handleLogin={handleLogin} />;
       case 'staffDashboard': return isStaffLoggedIn ? <StaffDashboardPage orders={orders} products={products} updateOrderStatus={updateOrderStatus} addNewProduct={addNewProduct} handleLogout={handleLogout} /> : <StaffLoginPage handleLogin={handleLogin} />;
-      default: return <HomePage products={products} mockReviews={mockReviews} setView={changeView} />;
+      // --- UPDATE: Pass orders array to homepage for the new track order form
+      default: return <HomePage products={products} mockReviews={mockReviews} setView={changeView} orders={orders} />;
     }
   };
 
@@ -81,3 +87,4 @@ export default function App() {
     </div>
   );
 }
+

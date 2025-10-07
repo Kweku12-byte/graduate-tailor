@@ -898,3 +898,39 @@ body {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+/* --- Homepage CTA & Track Order Sections --- */
+
+.cta-section {
+    padding: 4rem 1rem;
+    text-align: center;
+    background-color: #faf8f5; /* A very light, elegant cream background */
+    border-top: 1px solid #eee;
+}
+
+.cta-section .section-title {
+    margin-bottom: 1rem;
+}
+
+.cta-section .page-subtitle {
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.homepage-track-section {
+    padding: 4rem 1rem;
+    background-color: #ffffff;
+    border-top: 1px solid #eee;
+}
+/* --- Mobile Input Zoom Fix --- */
+
+/* Set a font-size of 16px on form inputs to prevent iOS devices 
+  from zooming in on focus.
+*/
+.form-input,
+.status-select,
+.form-select,
+.track-order-form .form-input {
+  font-size: 16px;
+}
